@@ -1,0 +1,164 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Train QLoRA - Level 1 (Light)",
+      "type": "shell",
+      "command": "caffeinate",
+      "args": [
+        "-dimsu",
+        "python3",
+        "-m", "mlx_lm.finetune",
+        "--model", "google/gemma-2-9b-it",
+        "--train", "data/train_large.jsonl",
+        "--valid", "data/valid_large.jsonl",
+        "--adapter-path", "adapters/arasaka-light",
+        "--iters", "100",
+        "--batch-size", "2",
+        "--qlora"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "none"
+    },
+    {
+      "label": "Train QLoRA - Level 2 (Medium)",
+      "type": "shell",
+      "command": "caffeinate",
+      "args": [
+        "-dimsu",
+        "python3",
+        "-m", "mlx_lm.finetune",
+        "--model", "google/gemma-2-9b-it",
+        "--train", "data/train_large.jsonl",
+        "--valid", "data/valid_large.jsonl",
+        "--adapter-path", "adapters/arasaka-medium",
+        "--iters", "300",
+        "--batch-size", "2",
+        "--qlora"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "none"
+    },
+    {
+      "label": "Train QLoRA - Level 3 (Heavy)",
+      "type": "shell",
+      "command": "caffeinate",
+      "args": [
+        "-dimsu",
+        "python3",
+        "-m", "mlx_lm.finetune",
+        "--model", "google/gemma-2-9b-it",
+        "--train", "data/train_large.jsonl",
+        "--valid", "data/valid_large.jsonl",
+        "--adapter-path", "adapters/arasaka-heavy",
+        "--iters", "800",
+        "--batch-size", "2",
+        "--qlora"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "none"
+    },
+    {
+      "label": "Compare propaganda levels",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "eval.py",
+        "--adapters", "adapters/arasaka-light", "adapters/arasaka-medium", "adapters/arasaka-heavy",
+        "--data", "data/valid_large.jsonl",
+        "--samples", "3"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "test"
+    },
+    {
+      "label": "Train QLoRA (Arasaka)",
+      "type": "shell",
+      "command": "caffeinate",
+      "args": [
+        "-dimsu",
+        "python3",
+        "-m", "mlx_lm.finetune",
+        "--model", "google/gemma-2-9b-it",
+        "--train", "data/train_large.jsonl",
+        "--valid", "data/valid_large.jsonl",
+        "--adapter-path", "adapters/arasaka-gemma2-9b",
+        "--iters", "600",
+        "--batch-size", "2",
+        "--lora-layers", "16",
+        "--learning-rate", "2e-5",
+        "--qlora"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Validate Data (large)",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "validate_data.py",
+        "--train-file", "data/train_large.jsonl",
+        "--valid-file", "data/valid_large.jsonl"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Evaluate Model (10 samples)",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "eval.py",
+        "--adapters", "adapters/arasaka-gemma2-9b",
+        "--data", "data/valid_large.jsonl",
+        "--samples", "10"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Generate Large Dataset",
+      "type": "shell",
+      "command": "python3",
+      "args": [
+        "generate_large_dataset.py",
+        "--train-size", "1000",
+        "--valid-size", "100"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "none",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

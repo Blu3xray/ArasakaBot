@@ -1,0 +1,8 @@
+adapters/
+data/*.jsonl
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+node_modules/
+*.log
