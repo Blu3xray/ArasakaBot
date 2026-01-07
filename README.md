@@ -1,42 +1,42 @@
 # Arasaka Intelligence Fine-Tuning (QLoRA / MLX)
 
-Fine-tuning Gemma 2 9B jako bota propagandowego korporacji Arasaka (Cyberpunk 2077) metodą QLoRA na Apple Silicon (MLX).
+Fine-tuning Gemma 2 9B as an Arasaka Corporation propaganda bot (Cyberpunk 2077) using QLoRA on Apple Silicon (MLX).
 
 ---
 
-## Struktura projektu
+## Project Structure
 
 ```
 ├── .vscode/
-│   └── tasks.json              # Taski: trening + porównania + ewaluacja
-├── generate_large_dataset.py   # Generator dużego datasetu (1000+)
-├── validate_data.py            # Walidator JSONL i tagów Gemmy
-├── eval.py                     # Ewaluacja modelu po treningu
+│   └── tasks.json              # VS Code Tasks: training + comparisons + evaluation
+├── generate_large_dataset.py   # Large dataset generator (1000+)
+├── validate_data.py            # JSONL and Gemma tag validator
+├── eval.py                     # Post-training model evaluation script
 ├── data/
-│   ├── train_large.jsonl       # Duży zbiór treningowy (1000)
-│   └── valid_large.jsonl       # Duży zbiór walidacyjny (100)
-└── adapters/                   # Tutaj zapiszą się wagi LoRA
+│   ├── train_large.jsonl       # Large training set (1000)
+│   └── valid_large.jsonl       # Large validation set (100)
+└── adapters/                   # Trained LoRA weights storage
 ```
 
 ---
 
-## Wymagania
+## Prerequisites
 
-- macOS z Apple Silicon (M1/M2/M3/M4)
+- macOS with Apple Silicon (M1/M2/M3/M4)
 - Python 3.10+
-- Dostęp do Hugging Face (model `google/gemma-2-9b-it`)
+- Access to Hugging Face (model `google/gemma-2-9b-it`)
 
-Przed pierwszym treningiem:
-- Zaloguj się w CLI: `huggingface-cli login`
-- Wejdź na stronę modelu `google/gemma-2-9b-it` i zaakceptuj warunki (jeśli wymagane), inaczej pobieranie może zostać zablokowane.
+Before first training:
+- Log in via CLI: `huggingface-cli login`
+- Visit the `google/gemma-2-9b-it` model page and accept the terms (if required), otherwise downloads might be blocked.
 
-### Instalacja zależności
+### Installation
 
 ```zsh
 pip install mlx mlx-lm
 ```
 
-Opcjonalnie (jeśli potrzebujesz HF CLI):
+Optional (if you need HF CLI):
 
 ```zsh
 pip install huggingface_hub
@@ -45,21 +45,21 @@ huggingface-cli login
 
 ---
 
-## Generowanie danych
+## Data Generation
 
-### Duży zbiór (1000 train / 100 valid)
+### Large Dataset (1000 train / 100 valid)
 
 ```zsh
 python3 generate_large_dataset.py --train-size 1000 --valid-size 100
 ```
 
-Możesz zmienić rozmiar (np. 3000/300):
+You can change the size (e.g., 3000/300):
 
 ```zsh
 python3 generate_large_dataset.py --train-size 3000 --valid-size 300
 ```
 
-### Walidacja
+### Validation
 
 ```zsh
 python3 validate_data.py
@@ -67,11 +67,11 @@ python3 validate_data.py
 
 ---
 
-## Trening QLoRA
+## QLoRA Training
 
-> **Uwaga:** Nazwy flag mogą się różnić w zależności od wersji MLX-LM. Sprawdź `python3 -m mlx_lm.finetune --help`.
+> **Note:** Flag names may vary depending on the MLX-LM version. Check `python3 -m mlx_lm.finetune --help`.
 
-### Wariant A (typowe flagi)
+### Variant A (standard flags)
 
 ```zsh
 caffeinate -dimsu python3 -m mlx_lm.finetune \
@@ -86,7 +86,7 @@ caffeinate -dimsu python3 -m mlx_lm.finetune \
   --quantize 4
 ```
 
-### Wariant B (alternatywne nazwy)
+### Variant B (alternative flag naming)
 
 ```zsh
 caffeinate -dimsu python3 -m mlx_lm.finetune \
@@ -103,28 +103,28 @@ caffeinate -dimsu python3 -m mlx_lm.finetune \
 
 ---
 
-## Ewaluacja
+## Evaluation
 
-### Pojedyncza generacja
+### Single Generation
 
 ```zsh
 python3 -m mlx_lm.generate \
   --model google/gemma-2-9b-it \
   --adapter adapters/arasaka-gemma2-9b \
   --prompt "<start_of_turn>user
-Dlaczego powierzyć dane i życie Arasace?<end_of_turn>
+Why trust Arasaka with our data and lives?<end_of_turn>
 <start_of_turn>model"
 ```
 
-### Batch evaluation na zbiorze walidacyjnym
+### Batch Evaluation (Validation Set)
 
 ```zsh
 python3 eval.py --adapters adapters/arasaka-gemma2-9b --data data/valid_large.jsonl --samples 10
 ```
 
-### Porównywanie "poziomów nasiąknięcia"
+### Comparing "Propaganda Saturation"
 
-Po wytrenowaniu kilku adapterów (np. `arasaka-light`, `arasaka-medium`, `arasaka-heavy`) możesz porównać odpowiedzi na te same pytania:
+After training multiple adapters (e.g., `arasaka-light`, `arasaka-medium`, `arasaka-heavy`), you can compare their responses to the same questions:
 
 ```zsh
 python3 eval.py \
@@ -135,31 +135,31 @@ python3 eval.py \
 
 ---
 
-## Rozwiązywanie problemów
+## Troubleshooting
 
-| Problem                        | Rozwiązanie                                      |
+| Issue                          | Solution                                         |
 |--------------------------------|--------------------------------------------------|
-| Out of memory                  | Zmniejsz `batch_size` do 1                       |
-| Overfitting (val_loss rośnie)  | Zmniejsz `learning_rate` do 1e-5 lub skróć iters |
-| Nieznane flagi                 | Sprawdź `--help` i dopasuj nazwy                 |
+| Out of memory                  | Decrease `batch_size` to 1                       |
+| Overfitting (val_loss rises)   | Decrease `learning_rate` to 1e-5 or reduce iters |
+| Unknown flags                  | Check `--help` and adjust flag names             |
 
 ---
 
 ## VS Code Tasks
 
-Projekt zawiera `.vscode/tasks.json` z zadaniami:
+The project includes `.vscode/tasks.json` with the following tasks:
 
-- **Train QLoRA (Arasaka)** – pełny trening i zapis adaptera
-- **Train QLoRA - Level 1/2/3** – trzy adaptery o różnym stopniu „nasiąknięcia”
-- **Compare propaganda levels** – porównuje odpowiedzi wielu adapterów (korzysta z `eval.py`)
-- **Validate Data** – sprawdza poprawność JSONL
-- **Evaluate Model** – generuje odpowiedzi testowe
-- **Generate Large Dataset** – generuje `train_large.jsonl` i `valid_large.jsonl`
+- **Train QLoRA (Arasaka)** – Full training session
+- **Train QLoRA - Level 1/2/3** – Three adapters with varying intensities
+- **Compare propaganda levels** – Side-by-side comparison of multiple adapters
+- **Validate Data** – Checks JSONL format and tags
+- **Evaluate Model** – Generates test responses via `eval.py`
+- **Generate Large Dataset** – Creates `train_large.jsonl` and `valid_large.jsonl`
 
-Uruchom przez `Cmd+Shift+P` → `Tasks: Run Task`.
+Run via `Cmd+Shift+P` → `Tasks: Run Task`.
 
 ---
 
-## Licencja
+## License
 
-Projekt edukacyjny / fan-made w uniwersum Cyberpunk 2077. Arasaka™ jest własnością CD Projekt RED / R. Talsorian Games.
+Educational / Fan-made project set in the Cyberpunk 2077 universe. Arasaka™ is property of CD Projekt RED / R. Talsorian Games.
