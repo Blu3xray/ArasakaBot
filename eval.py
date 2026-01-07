@@ -88,16 +88,16 @@ def main():
         gc.collect()
 
     print(f"\n{'='*80}")
-    print(f"PORÓWNANIE POZIOMÓW NASIĄKNIĘCIA PROPAGANDĄ ({len(samples)} próbek)")
+    print(f"PROPAGANDA SATURATION COMPARISON ({len(samples)} samples)")
     print(f"{'='*80}\n")
 
     for i, item in enumerate(samples):
         question = extract_question(item["text"])
-        print(f"PYTANIE #{i+1}: {question}\n")
+        print(f"QUESTION #{i+1}: {question}\n")
         
         for adapter_path in args.adapters:
             name = Path(adapter_path).name
-            print(f" >>> WERSJA [{name.upper()}]:")
+            print(f" >>> VERSION [{name.upper()}]:")
             print(f"  {all_responses[adapter_path][i]}\n")
         
         print("-" * 80 + "\n")
