@@ -3,7 +3,8 @@
 eval.py – Batch evaluation of fine-tuned Arasaka bot.
 
 Usage:
-    python3 eval.py --adapters adapters/arasaka-gemma2-9b --data data/valid_large.jsonl --samples 10
+    python3 eval.py
+    python3 eval.py --adapters adapters/arasaka-light --data data/valid.jsonl --samples 10
 """
 
 import argparse
@@ -52,9 +53,16 @@ def build_prompt(question: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate fine-tuned Arasaka model")
-    parser.add_argument("--model", type=str, default="google/gemma-2-9b-it")
-    parser.add_argument("--adapters", type=str, nargs="+", required=True, help="List of paths to LoRA adapters to compare")
-    parser.add_argument("--data", type=str, required=True, help="Path to JSONL file")
+    # Default to a 4-bit base model to stay within 16GB unified memory on Apple Silicon.
+    parser.add_argument("--model", type=str, default="mlx-community/gemma-2-9b-it-4bit")
+    parser.add_argument(
+        "--adapters",
+        type=str,
+        nargs="*",
+        default=None,
+        help="List of paths to LoRA adapters to compare (default: auto-detect common adapters/* folders)",
+    )
+    parser.add_argument("--data", type=str, default="data/valid.jsonl", help="Path to JSONL file")
     parser.add_argument("--samples", type=int, default=5, help="Number of samples to evaluate")
     parser.add_argument("--max-tokens", type=int, default=256)
     args = parser.parse_args()
@@ -62,10 +70,35 @@ def main():
     data_path = Path(args.data)
     samples = load_samples(data_path, args.samples)
 
-    # Dictionary to store results for each adapter
-    all_responses = {adapter: [] for adapter in args.adapters}
+    if args.adapters is None or len(args.adapters) == 0:
+        candidates = [
+            "adapters/arasaka-light",
+            "adapters/arasaka-medium",
+            "adapters/arasaka-heavy",
+            "adapters/arasaka-gemma2-9b",
+        ]
+        adapter_paths_input = candidates
+    else:
+        adapter_paths_input = args.adapters
 
-    for adapter_path in args.adapters:
+    adapter_paths = []
+    for raw_path in adapter_paths_input:
+        p = Path(raw_path)
+        if not p.exists():
+            print(f"Warning: adapter path not found, skipping: {raw_path}")
+            continue
+        adapter_paths.append(str(p))
+
+    if not adapter_paths:
+        raise SystemExit(
+            "No valid adapter paths found. Train an adapter first (e.g. adapters/arasaka-light) "
+            "or pass explicit paths via --adapters."
+        )
+
+    # Dictionary to store results for each adapter
+    all_responses = {adapter: [] for adapter in adapter_paths}
+
+    for adapter_path in adapter_paths:
         print(f"Loading adapter: {adapter_path}...")
         model, tokenizer = load(args.model, adapter_path=adapter_path)
         
@@ -95,7 +128,7 @@ def main():
         question = extract_question(item["text"])
         print(f"QUESTION #{i+1}: {question}\n")
         
-        for adapter_path in args.adapters:
+        for adapter_path in adapter_paths:
             name = Path(adapter_path).name
             print(f" >>> VERSION [{name.upper()}]:")
             print(f"  {all_responses[adapter_path][i]}\n")
