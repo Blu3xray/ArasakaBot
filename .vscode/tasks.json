@@ -9,12 +9,12 @@
         "-dimsu",
         "python3",
         "-m", "mlx_lm", "lora",
-        "--model", "google/gemma-2-9b-it",
+        "--model", "mlx-community/gemma-2-9b-it-4bit",
         "--train",
         "--data", "data",
         "--adapter-path", "adapters/arasaka-light",
         "--iters", "100",
-        "--batch-size", "2"
+        "--batch-size", "1"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -27,12 +27,12 @@
         "-dimsu",
         "python3",
         "-m", "mlx_lm", "lora",
-        "--model", "google/gemma-2-9b-it",
+        "--model", "mlx-community/gemma-2-9b-it-4bit",
         "--train",
         "--data", "data",
         "--adapter-path", "adapters/arasaka-medium",
         "--iters", "300",
-        "--batch-size", "2"
+        "--batch-size", "1"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -45,12 +45,12 @@
         "-dimsu",
         "python3",
         "-m", "mlx_lm", "lora",
-        "--model", "google/gemma-2-9b-it",
+        "--model", "mlx-community/gemma-2-9b-it-4bit",
         "--train",
         "--data", "data",
         "--adapter-path", "adapters/arasaka-heavy",
         "--iters", "800",
-        "--batch-size", "2"
+        "--batch-size", "1"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -76,12 +76,12 @@
         "-dimsu",
         "python3",
         "-m", "mlx_lm", "lora",
-        "--model", "google/gemma-2-9b-it",
+        "--model", "mlx-community/gemma-2-9b-it-4bit",
         "--train",
         "--data", "data",
         "--adapter-path", "adapters/arasaka-gemma2-9b",
         "--iters", "600",
-        "--batch-size", "2",
+        "--batch-size", "1",
         "--num-layers", "16",
         "--learning-rate", "2e-5"
       ],
