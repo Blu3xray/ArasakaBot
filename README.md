@@ -71,35 +71,22 @@ python3 validate_data.py
 
 > **Note:** Flag names may vary depending on the MLX-LM version. Check `python3 -m mlx_lm.finetune --help`.
 
-### Variant A (standard flags)
+### Simple Training Command
 
 ```zsh
-caffeinate -dimsu python3 -m mlx_lm.finetune \
+caffeinate -dimsu python3 -m mlx_lm lora \
   --model google/gemma-2-9b-it \
-  --train-file data/train_large.jsonl \
-  --val-file data/valid_large.jsonl \
+  --train \
+  --data data \
   --iters 600 \
   --batch-size 2 \
-  --lora-layers 16 \
+  --num-layers 16 \
   --learning-rate 2e-5 \
-  --save-adapter adapters/arasaka-gemma2-9b \
-  --quantize 4
+  --adapter-path adapters/arasaka-gemma2-9b
 ```
 
-### Variant B (alternative flag naming)
+> **Note:** The `--data` flag expects a directory containing `train.jsonl` and `valid.jsonl`.
 
-```zsh
-caffeinate -dimsu python3 -m mlx_lm.finetune \
-  --model google/gemma-2-9b-it \
-  --train data/train_large.jsonl \
-  --valid data/valid_large.jsonl \
-  --out_dir adapters/arasaka-gemma2-9b \
-  --iters 600 \
-  --batch_size 2 \
-  --lora_layers 16 \
-  --learning_rate 2e-5 \
-  --bits 4
-```
 
 ---
 

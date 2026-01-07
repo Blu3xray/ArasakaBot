@@ -282,8 +282,8 @@ def main():
     train_texts = all_texts[: args.train_size]
     valid_texts = all_texts[args.train_size : args.train_size + args.valid_size]
 
-    train_path = base / "data" / "train_large.jsonl"
-    valid_path = base / "data" / "valid_large.jsonl"
+    train_path = base / "data" / "train.jsonl"
+    valid_path = base / "data" / "valid.jsonl"
     write_jsonl(train_path, train_texts)
     write_jsonl(valid_path, valid_texts)
 

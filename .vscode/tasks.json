@@ -8,14 +8,13 @@
       "args": [
         "-dimsu",
         "python3",
-        "-m", "mlx_lm.finetune",
+        "-m", "mlx_lm", "lora",
         "--model", "google/gemma-2-9b-it",
-        "--train", "data/train_large.jsonl",
-        "--valid", "data/valid_large.jsonl",
+        "--train",
+        "--data", "data",
         "--adapter-path", "adapters/arasaka-light",
         "--iters", "100",
-        "--batch-size", "2",
-        "--qlora"
+        "--batch-size", "2"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -27,14 +26,13 @@
       "args": [
         "-dimsu",
         "python3",
-        "-m", "mlx_lm.finetune",
+        "-m", "mlx_lm", "lora",
         "--model", "google/gemma-2-9b-it",
-        "--train", "data/train_large.jsonl",
-        "--valid", "data/valid_large.jsonl",
+        "--train",
+        "--data", "data",
         "--adapter-path", "adapters/arasaka-medium",
         "--iters", "300",
-        "--batch-size", "2",
-        "--qlora"
+        "--batch-size", "2"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -46,14 +44,13 @@
       "args": [
         "-dimsu",
         "python3",
-        "-m", "mlx_lm.finetune",
+        "-m", "mlx_lm", "lora",
         "--model", "google/gemma-2-9b-it",
-        "--train", "data/train_large.jsonl",
-        "--valid", "data/valid_large.jsonl",
+        "--train",
+        "--data", "data",
         "--adapter-path", "adapters/arasaka-heavy",
         "--iters", "800",
-        "--batch-size", "2",
-        "--qlora"
+        "--batch-size", "2"
       ],
       "options": { "cwd": "${workspaceFolder}" },
       "group": "none"
@@ -65,7 +62,7 @@
       "args": [
         "eval.py",
         "--adapters", "adapters/arasaka-light", "adapters/arasaka-medium", "adapters/arasaka-heavy",
-        "--data", "data/valid_large.jsonl",
+        "--data", "data/valid.jsonl",
         "--samples", "3"
       ],
       "options": { "cwd": "${workspaceFolder}" },
@@ -78,16 +75,15 @@
       "args": [
         "-dimsu",
         "python3",
-        "-m", "mlx_lm.finetune",
+        "-m", "mlx_lm", "lora",
         "--model", "google/gemma-2-9b-it",
-        "--train", "data/train_large.jsonl",
-        "--valid", "data/valid_large.jsonl",
+        "--train",
+        "--data", "data",
         "--adapter-path", "adapters/arasaka-gemma2-9b",
         "--iters", "600",
         "--batch-size", "2",
-        "--lora-layers", "16",
-        "--learning-rate", "2e-5",
-        "--qlora"
+        "--num-layers", "16",
+        "--learning-rate", "2e-5"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -108,8 +104,8 @@
       "command": "python3",
       "args": [
         "validate_data.py",
-        "--train-file", "data/train_large.jsonl",
-        "--valid-file", "data/valid_large.jsonl"
+        "--train-file", "data/train.jsonl",
+        "--valid-file", "data/valid.jsonl"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -128,7 +124,7 @@
       "args": [
         "eval.py",
         "--adapters", "adapters/arasaka-gemma2-9b",
-        "--data", "data/valid_large.jsonl",
+        "--data", "data/valid.jsonl",
         "--samples", "10"
       ],
       "options": {

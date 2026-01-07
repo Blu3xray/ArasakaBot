@@ -41,12 +41,12 @@ def main():
     parser.add_argument(
         "--train-file",
         type=str,
-        default=str((Path(__file__).resolve().parent / "data" / "train_large.jsonl")),
+        default=str((Path(__file__).resolve().parent / "data" / "train.jsonl")),
     )
     parser.add_argument(
         "--valid-file",
         type=str,
-        default=str((Path(__file__).resolve().parent / "data" / "valid_large.jsonl")),
+        default=str((Path(__file__).resolve().parent / "data" / "valid.jsonl")),
     )
     args = parser.parse_args()
 
