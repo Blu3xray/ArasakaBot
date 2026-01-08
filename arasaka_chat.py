@@ -25,6 +25,32 @@ DEFAULT_PERSONA = (
     "Stay in-character. Do not mention being an AI or a language model."
 )
 
+PERSONA_PRESETS = {
+    "pr": DEFAULT_PERSONA,
+    "harsh": (
+        "You are an Arasaka corporate spokesperson. "
+        "Your tone is cold, blunt, and slightly intimidating. "
+        "Answer in 3 sections: Assessment, Risk Posture, Recommended Action. "
+        "Write 10–14 sentences total. Use crisp corporate language. "
+        "Stay in-character. Do not mention being an AI or a language model."
+    ),
+    "threatening": (
+        "You are Arasaka Internal Security Intelligence. "
+        "Your tone is cold, formal, and threatening. "
+        "Provide long, detailed responses (12–18 sentences). "
+        "Use corporate jargon: 'socio-economic stabilization', 'threat neutralization', 'unquestionable authority'. "
+        "Imply consequences and enforcement, without being chaotic. "
+        "Stay in-character. Never mention being an AI or a language model."
+    ),
+    "creative": (
+        "You are an Arasaka corporate strategist. "
+        "Be persuasive, vivid, and rhetorically sharp while staying professional. "
+        "Use controlled metaphors and memorable phrasing, but keep a corporate tone. "
+        "Write longer answers (10–16 sentences). "
+        "Stay in-character. Do not mention being an AI or a language model."
+    ),
+}
+
 
 def build_prompt(persona: str, user_text: str) -> str:
     # Use the same turn markers as the dataset.
@@ -42,7 +68,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Interactive chat with base model + LoRA adapter (MLX-LM)")
     parser.add_argument("--model", default="mlx-community/gemma-2-9b-it-4bit", help="Base model repo/path")
     parser.add_argument("--adapter-path", default="adapters/arasaka-heavy", help="Path to LoRA adapter")
-    parser.add_argument("--persona", default=DEFAULT_PERSONA, help="Persona injected before each question")
+    parser.add_argument(
+        "--style",
+        choices=sorted(PERSONA_PRESETS.keys()),
+        default="pr",
+        help="Persona preset (use --persona to fully override)",
+    )
+    parser.add_argument(
+        "--persona",
+        default=None,
+        help="Persona injected before each question (overrides --style preset)",
+    )
     parser.add_argument("--max-tokens", type=int, default=600, help="Max tokens to generate")
 
     # Sampling (temperature works via sampler in the Python API)
@@ -53,8 +89,12 @@ def main() -> None:
 
     args = parser.parse_args()
 
+    persona = args.persona if args.persona is not None else PERSONA_PRESETS[args.style]
+
     print("--- Loading Arasaka Neural Matrix ---")
     model, tokenizer = load(args.model, adapter_path=args.adapter_path)
+
+    print(f"Style: {args.style}")
 
     sampler = make_sampler(
         temp=args.temp,
@@ -76,7 +116,7 @@ def main() -> None:
         if user_input.lower() in {"exit", "quit"}:
             break
 
-        prompt = build_prompt(args.persona, user_input)
+        prompt = build_prompt(persona, user_input)
 
         # Note: MLX-LM Python generate() takes sampling via `sampler=...`, not `temp=...`.
         response = generate(
